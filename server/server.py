@@ -18,20 +18,24 @@ app = Flask(__name__)
 # Define the prediction endpoint
 @app.route('/predict', methods=['POST'])
 def predict():
-    # Get JSON data from request
-    data = request.get_json()
-    headline = data['headline']
+    try:
+        # Get JSON data from request
+        data = request.get_json(force=True)
+        headline = data.get('headline', '')
 
-    # Preprocess the input
-    sequence = tokenizer.texts_to_sequences([headline])
-    padded_sequence = pad_sequences(sequence, maxlen=100, padding='post', truncating='post')
+        if not headline:
+            return jsonify({'error': 'No headline provided'}), 400
 
-    # Make prediction
-    prediction = model.predict(padded_sequence)
-    label = label_encoder.inverse_transform([prediction.argmax(axis=1)[0]])
+        # Preprocess the input
+        sequence = tokenizer.texts_to_sequences([headline])
+        padded_sequence = pad_sequences(sequence, maxlen=100, padding='post', truncating='post')
 
-    # Return the result
-    return jsonify({'headline': headline, 'sentiment': label[0]})
+        # Make prediction
+        prediction = model.predict(padded_sequence)
+        label = label_encoder.inverse_transform([prediction.argmax(axis=1)[0]])
 
-if __name__ == '__main__':
-    app.run(debug=True)
+        # Return the result
+        return jsonify({'headline': headline, 'sentiment': label[0]})
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
