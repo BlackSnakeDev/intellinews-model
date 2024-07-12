@@ -1,3 +1,7 @@
+
+# python -m waitress --port=5000 wsgi:app
+
+
 from flask import Flask, request, jsonify
 import tensorflow as tf
 import pickle
@@ -39,3 +43,4 @@ def predict():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
