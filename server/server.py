@@ -1,3 +1,7 @@
+
+# $env:TF_ENABLE_ONEDNN_OPTS=0
+
+
 from flask import Flask, request, jsonify
 import tensorflow as tf
 import pickle
